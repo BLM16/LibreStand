@@ -1,0 +1,35 @@
+name: Build
+description: 'Builds LibreStand'
+
+inputs:
+  configuration:
+    description: 'The build configuration to compile for - Debug or Release'
+    required: false
+    type: string
+    default: 'Release'
+    
+  platform:
+    description: 'The platform to compile for - net8.0-android, net8.0-ios, net8.0-maccatalyst'
+    required: false
+    type: string
+    default: 'net8.0-android'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Install .NET MAUI
+      run: dotnet workload install maui
+      shell: bash
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      shell: bash
+
+    - name: Build
+      run: dotnet build --no-restore -c ${{ inputs.configuration }} -f ${{ inputs.platform }}
+      shell: bash
